@@ -9,15 +9,22 @@ import {
     Webhook,
     Settings,
     FileText,
-    FolderOpen
+    FolderOpen,
+    LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
+import { useSession, signOut } from "next-auth/react";
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar";
 
 const navItems = [
-    { name: "Convert", href: "/convert", icon: RefreshCw },
     { name: "Projects", href: "/projects", icon: FolderOpen },
+    { name: "Convert", href: "/convert", icon: RefreshCw },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
     { name: "API & Integrations", href: "/api-integration", icon: Webhook },
     { name: "Settings", href: "/settings", icon: Settings },
@@ -30,10 +37,7 @@ export function Sidebar() {
         <div className="hidden border-r bg-sidebar md:block w-64 flex-col h-screen sticky top-0">
             <div className="flex h-16 items-center border-b px-6">
                 <Link href="/" className="flex items-center gap-2 font-bold text-lg text-sidebar-foreground">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                        <FileText className="h-5 w-5" />
-                    </div>
-                    <span>BankStatement Pro</span>
+                    <img src="/fintech.png" alt="ZentriFin Logo" className="w-54 rounded-lg" />
                 </Link>
             </div>
             <div className="flex-1 overflow-auto py-4">
@@ -58,12 +62,37 @@ export function Sidebar() {
                     })}
                 </nav>
             </div>
-            <div className="mt-auto border-t p-4">
+            <div className="mt-auto border-t p-4 space-y-4">
                 <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Theme</span>
                     <ModeToggle />
                 </div>
+
+                <UserProfile />
             </div>
         </div>
     );
+}
+
+function UserProfile() {
+    const { data: session } = useSession();
+
+    if (!session?.user) return null;
+
+    return (
+        <div className="flex items-center gap-3 rounded-lg border p-3 shadow-sm bg-card">
+            <Avatar className="h-9 w-9">
+                <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
+                <AvatarFallback>{session.user.name?.charAt(0) || "U"}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-1 flex-col overflow-hidden">
+                <span className="truncate text-sm font-medium">{session.user.name}</span>
+                <span className="truncate text-xs text-muted-foreground">{session.user.email}</span>
+            </div>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => signOut()}>
+                <LogOut className="h-4 w-4" />
+                <span className="sr-only">Sign out</span>
+            </Button>
+        </div>
+    )
 }

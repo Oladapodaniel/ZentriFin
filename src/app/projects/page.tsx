@@ -53,9 +53,29 @@ export default function ProjectsPage() {
                     </Button>
                 </div>
 
-                <ProjectsCharts projects={projects} />
-
-                <ProjectsTable projects={projects} />
+                {projects.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-[50vh] space-y-4 border-2 border-dashed rounded-lg bg-muted/10">
+                        <div className="p-4 rounded-full bg-muted">
+                            <Plus className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                        <div className="text-center space-y-1">
+                            <h3 className="text-lg font-semibold">No projects yet</h3>
+                            <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+                                Upload your first bank statement to start converting data.
+                            </p>
+                        </div>
+                        <Button asChild>
+                            <Link href="/convert">
+                                Create your first project
+                            </Link>
+                        </Button>
+                    </div>
+                ) : (
+                    <>
+                        <ProjectsCharts projects={projects} />
+                        <ProjectsTable projects={projects} />
+                    </>
+                )}
             </div>
         </AppShell>
     );

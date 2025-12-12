@@ -4,9 +4,15 @@ import { processingQueue } from '@/lib/queue';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { auth } from '@/auth';
 
 export async function POST(req: NextRequest) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const formData = await req.formData();
         const files = formData.getAll('files') as File[];
         const projectName = formData.get('projectName') as string || `Batch ${new Date().toISOString()}`;
@@ -30,6 +36,7 @@ export async function POST(req: NextRequest) {
                     data: {
                         name: files.length > 1 ? `${projectName} - ${file.name}` : projectName,
                         status: 'processing',
+                        userId: session.user.id,
                     },
                 });
 
@@ -57,6 +64,7 @@ export async function POST(req: NextRequest) {
                 data: {
                     name: projectName,
                     status: 'processing',
+                    userId: session.user.id,
                 },
             });
 

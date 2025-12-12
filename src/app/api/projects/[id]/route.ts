@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { auth } from '@/auth';
 
 export async function GET(
     req: NextRequest,
@@ -8,8 +9,16 @@ export async function GET(
     const { id } = await params;
 
     try {
-        const project = await prisma.project.findUnique({
-            where: { id },
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const project = await prisma.project.findFirst({
+            where: {
+                id,
+                userId: session.user.id
+            },
             include: {
                 files: {
                     include: {

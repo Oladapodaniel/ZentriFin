@@ -8,12 +8,14 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "BankStatement Pro",
+  title: "ZentriFin",
   description: "Convert bank statements to clean, structured data.",
 };
 
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+
+import { SessionProvider } from "@/components/session-provider";
 
 export default function RootLayout({
   children,
@@ -25,15 +27,17 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

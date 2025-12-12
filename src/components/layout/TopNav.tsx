@@ -17,7 +17,7 @@ import { Sidebar } from "./Sidebar"; // Reuse sidebar content for mobile
 
 export function TopNav() {
     return (
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 bg-transparent px-6 backdrop-blur supports-[backdrop-filter]:bg-transparent">
             <Sheet>
                 <SheetTrigger asChild>
                     <Button variant="outline" size="icon" className="shrink-0 md:hidden">

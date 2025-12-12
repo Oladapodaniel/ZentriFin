@@ -11,10 +11,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
 
                 <div className="relative z-10 flex items-center gap-2 text-xl font-bold tracking-tight">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                        <ShieldCheck className="h-5 w-5" />
-                    </div>
-                    BankStatement Pro
+                    <img src="/fintech_dark.png" alt="ZentriFin Logo" className="w-54 rounded-md" />
                 </div>
 
                 <div className="relative z-10 max-w-md">
@@ -30,7 +27,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                 </div>
 
                 <div className="relative z-10 text-sm text-zinc-500">
-                    © 2024 BankStatement Pro. All rights reserved.
+                    © 2024 ZentriFin. All rights reserved.
                 </div>
             </div>
 
