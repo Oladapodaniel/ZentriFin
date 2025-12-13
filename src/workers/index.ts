@@ -247,3 +247,15 @@ async function acaProcessing(fileId: string, filePath: string, token: string) {
 }
 
 console.log('Worker started...');
+
+// Simple HTTP server to satisfy Render's port requirement for Web Services
+import http from 'http';
+const port = process.env.PORT || 3000;
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Worker is running\n');
+});
+
+server.listen(port, () => {
+    console.log(`Health check server listening on port ${port}`);
+});
