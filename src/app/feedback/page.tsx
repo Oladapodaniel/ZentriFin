@@ -10,6 +10,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MessageSquare, Send, CheckCircle2 } from "lucide-react";
 
 export default function FeedbackPage() {
+    if (!process.env.NEXT_PUBLIC_FORMSPREE_ID) {
+        return (
+            <AppShell>
+                <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-6">
+                    <div className="p-4 rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                        {/* <ExclamationTriangle className="h-12 w-12" /> */}
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-2xl font-bold tracking-tight">Error</h2>
+                        <p className="text-muted-foreground max-w-md mx-auto">
+                            We are unable to process your feedback at this time. Please try again later.
+                        </p>
+                    </div>
+                </div>
+            </AppShell>
+        );
+    }
     const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORMSPREE_ID as string);
 
     if (state.succeeded) {
