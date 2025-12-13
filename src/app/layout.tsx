@@ -26,6 +26,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${outfit.variable} antialiased`}
+        style={{ fontFamily: outfit.style.fontFamily }}
       >
         <SessionProvider>
           <ThemeProvider

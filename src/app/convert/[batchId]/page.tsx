@@ -184,7 +184,7 @@ ${batch.transactions.map(t => `<STMTTRN>
 
     return (
         <AppShell>
-            <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col">
+            <div className="space-y-6 h-auto lg:h-[calc(100vh-8rem)] flex flex-col">
                 {/* Header & Steps */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6 shrink-0">
                     <div>
@@ -202,7 +202,7 @@ ${batch.transactions.map(t => `<STMTTRN>
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
                         {STEPS.map((step, i) => (
                             <div key={step} className="flex items-center">
                                 <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${step === "Validate"
@@ -225,14 +225,40 @@ ${batch.transactions.map(t => `<STMTTRN>
                 {/* Main Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
                     {/* Left Column: Validation & Transactions */}
-                    <div className="flex flex-col lg:col-span-2 h-full gap-4 overflow-hidden">
+                    <div className="flex flex-col lg:col-span-2 h-full gap-4 overflow-visible lg:overflow-hidden">
                         {/* Validation Summary */}
-                        <div className="shrink-0">
+                        <div className="shrink-0 space-y-4">
                             <ValidationPanel summary={batch.validationSummary} />
+
+                            {/* Mobile PDF Preview Button */}
+                            <div className="lg:hidden relative z-10 mt-4">
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" className="w-full">
+                                            <FileText className="mr-2 h-4 w-4" /> Preview Original Document
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="h-[80vh] w-[95vw] max-w-4xl p-0">
+                                        <div className="h-full w-full bg-muted rounded-lg overflow-hidden">
+                                            {selectedFileId ? (
+                                                <iframe
+                                                    src={`/api/files/${selectedFileId}`}
+                                                    className="w-full h-full"
+                                                    title="PDF Preview"
+                                                />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full text-muted-foreground">
+                                                    No file selected
+                                                </div>
+                                            )}
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
                         </div>
 
                         {/* Transactions Table */}
-                        <div className="flex-1 overflow-auto border rounded-lg bg-card flex flex-col">
+                        <div className="flex-1 lg:overflow-auto border rounded-lg bg-card flex flex-col">
                             <TransactionTable
                                 transactions={batch.transactions}
                                 onUpdateTransaction={handleUpdateTransaction}
@@ -248,8 +274,6 @@ ${batch.transactions.map(t => `<STMTTRN>
                                         id: Math.random().toString(36).substr(2, 9),
                                         description: `${t.description} (Copy)`
                                     }));
-                                    // Insert after the last selected item or at end? Let's append for now or insert after.
-                                    // Appending is safer for index stability.
                                     setBatch({ ...batch, transactions: [...batch.transactions, ...newTransactions] });
                                     toast.success(`Duplicated ${ids.length} transactions`);
                                 }}
@@ -258,8 +282,8 @@ ${batch.transactions.map(t => `<STMTTRN>
                         </div>
                     </div>
 
-                    {/* Right Column: PDF Viewer */}
-                    <div className="flex flex-col lg:col-span-1 h-full gap-4 overflow-hidden">
+                    {/* Right Column: PDF Viewer (Desktop Only) */}
+                    <div className="hidden lg:flex flex-col lg:col-span-1 h-full gap-4 overflow-hidden">
                         {/* File Selector */}
                         {batch.files.length > 1 && (
                             <Select value={selectedFileId || ""} onValueChange={setSelectedFileId}>
@@ -289,9 +313,8 @@ ${batch.transactions.map(t => `<STMTTRN>
                             )}
                         </div>
 
-                        {/* Export Button (kept here or moved? User said summary card above table, PDF stretches down. Export button can stay here or go to header? Let's keep it here for now as primary action) */}
+                        {/* Export Button */}
                         <div className="shrink-0">
-
                             <Dialog>
                                 <DialogTrigger asChild>
                                     <Button id="export-trigger" size="lg" className="w-full font-semibold shadow-lg shadow-primary/20">

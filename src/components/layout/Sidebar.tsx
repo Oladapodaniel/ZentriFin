@@ -10,7 +10,8 @@ import {
     Settings,
     FileText,
     FolderOpen,
-    LogOut
+    LogOut,
+    MessageSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ const navItems = [
     { name: "Convert", href: "/convert", icon: RefreshCw },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
     { name: "API & Integrations", href: "/api-integration", icon: Webhook },
+    { name: "Feedback", href: "/feedback", icon: MessageSquare },
     { name: "Settings", href: "/settings", icon: Settings },
 ];
 

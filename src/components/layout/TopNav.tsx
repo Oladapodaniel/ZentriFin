@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, LogOut, Settings, User, Menu } from "lucide-react";
+import { CreditCard, LogOut, Settings, User, Menu, FolderOpen, RefreshCw, BarChart3, Webhook, MessageSquare } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Sidebar } from "./Sidebar"; // Reuse sidebar content for mobile
 
@@ -27,10 +28,34 @@ export function TopNav() {
                 </SheetTrigger>
                 <SheetContent side="left" className="p-0 w-64">
                     {/* Mobile Sidebar Content - we can duplicate or extract the nav logic */}
-                    <div className="h-full bg-sidebar">
-                        {/* Simplified mobile nav logic here or reuse Sidebar component if adapted */}
-                        <div className="p-6 font-bold text-lg">BankStatement Pro</div>
-                        {/* ... links ... */}
+                    <div className="h-full bg-sidebar flex flex-col">
+                        <div className="flex h-16 items-center border-b px-6">
+                            <Link href="/" className="flex items-center gap-2 font-bold text-lg text-sidebar-foreground">
+                                <img src="/fintech.png" alt="ZentriFin Logo" className="h-8 w-8 rounded-lg" />
+                                <span>ZentriFin</span>
+                            </Link>
+                        </div>
+                        <div className="flex-1 overflow-auto py-4">
+                            <nav className="grid items-start px-4 text-sm font-medium gap-1">
+                                {[
+                                    { name: "Projects", href: "/projects", icon: FolderOpen },
+                                    { name: "Convert", href: "/convert", icon: RefreshCw },
+                                    { name: "Analytics", href: "/analytics", icon: BarChart3 },
+                                    { name: "API & Integrations", href: "/api-integration", icon: Webhook },
+                                    { name: "Feedback", href: "/feedback", icon: MessageSquare },
+                                    { name: "Settings", href: "/settings", icon: Settings },
+                                ].map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50 transition-all"
+                                    >
+                                        <item.icon className="h-4 w-4" />
+                                        {item.name}
+                                    </Link>
+                                ))}
+                            </nav>
+                        </div>
                     </div>
                 </SheetContent>
             </Sheet>

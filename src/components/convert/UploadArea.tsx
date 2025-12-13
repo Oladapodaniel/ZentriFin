@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { UploadCloud, FileUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface UploadAreaProps {
     onFilesSelected: (files: File[]) => void;
@@ -12,6 +13,21 @@ interface UploadAreaProps {
 
 export function UploadArea({ onFilesSelected, disabled }: UploadAreaProps) {
     const [isDragging, setIsDragging] = useState(false);
+
+    const validateAndPassFiles = useCallback((files: File[]) => {
+        if (files.length > 2) {
+            toast.error("Maximum 2 files allowed.");
+            return;
+        }
+
+        const pdfFiles = files.filter(f => f.type === "application/pdf");
+        if (pdfFiles.length !== files.length) {
+            toast.error("Only PDF files are allowed.");
+            return;
+        }
+
+        onFilesSelected(pdfFiles);
+    }, [onFilesSelected]);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -29,15 +45,15 @@ export function UploadArea({ onFilesSelected, disabled }: UploadAreaProps) {
         if (disabled) return;
 
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            onFilesSelected(Array.from(e.dataTransfer.files));
+            validateAndPassFiles(Array.from(e.dataTransfer.files));
         }
-    }, [disabled, onFilesSelected]);
+    }, [disabled, validateAndPassFiles]);
 
     const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            onFilesSelected(Array.from(e.target.files));
+            validateAndPassFiles(Array.from(e.target.files));
         }
-    }, [onFilesSelected]);
+    }, [validateAndPassFiles]);
 
     return (
         <div
@@ -64,12 +80,13 @@ export function UploadArea({ onFilesSelected, disabled }: UploadAreaProps) {
                     {isDragging ? "Drop files here" : "Drag & drop statements here"}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-6 max-w-xs">
-                    PDFs, Images (JPG, PNG), or CSVs. Up to 500 pages per batch.
+                    PDFs only. Max 2 files per batch.
                 </p>
 
                 <div className="relative">
                     <input
                         type="file"
+                        accept="application/pdf"
                         multiple
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                         onChange={handleFileInput}
