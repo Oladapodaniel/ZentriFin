@@ -27,7 +27,7 @@ export default function FeedbackPage() {
             </AppShell>
         );
     }
-    const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORMSPREE_ID as string);
+    const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORMSPREE_ID as string || "123");
 
     if (state.succeeded) {
         return (
