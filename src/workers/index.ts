@@ -257,6 +257,7 @@ async function acaProcessing(fileId: string, filePath: string, token: string) {
 }
 
 console.log('Worker started...');
+console.log('Worker Version: Supabase Storage Enabled');
 
 // Simple HTTP server to satisfy Render's port requirement for Web Services
 import http from 'http';
