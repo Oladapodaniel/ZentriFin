@@ -3,8 +3,8 @@ import { Worker } from 'bullmq';
 import IORedis from 'ioredis';
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { prisma } from '@/lib/db';
-import fs from 'fs/promises';
 import path from 'path';
+import { supabaseAdmin } from '@/lib/supabase';
 
 const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
     maxRetriesPerRequest: null,
@@ -101,7 +101,17 @@ async function mockProcessing(fileId: string) {
 }
 
 async function acaProcessing(fileId: string, filePath: string, token: string) {
-    const fileBuffer = await fs.readFile(filePath);
+    // Download file from Supabase Storage
+    const { data: fileBlob, error: downloadError } = await supabaseAdmin
+        .storage
+        .from('statements')
+        .download(filePath);
+
+    if (downloadError || !fileBlob) {
+        throw new Error(`Failed to download file from storage: ${downloadError?.message}`);
+    }
+
+    const fileBuffer = Buffer.from(await fileBlob.arrayBuffer());
     const base64Content = fileBuffer.toString('base64');
 
     // Determine file type (simple check)

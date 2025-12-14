@@ -12,7 +12,8 @@
     "kill:server": "pkill -f 'npm run dev:all' || true && pkill -f 'next dev' || true && pkill -f 'tsx src/workers/index.ts' || true",
     "run:docker": "docker-compose up -d",
     "kill:docker": "docker compose stop",
-    "view:prisma": "npx prisma studio"
+    "view:prisma": "npx prisma studio",
+    "run:migration": "npx dotenv -e .env.production -- npx prisma db push"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -33,6 +34,7 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@supabase/supabase-js": "^2.87.1",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.65.1",
     "class-variance-authority": "^0.7.1",
@@ -67,6 +69,7 @@
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
     "concurrently": "^9.2.1",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.8",
     "prisma": "^6.19.1",

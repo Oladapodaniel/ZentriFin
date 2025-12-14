@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { processingQueue } from '@/lib/queue';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { auth } from '@/auth';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(req: NextRequest) {
     try {
@@ -22,10 +21,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'No files uploaded' }, { status: 400 });
         }
 
-        // Ensure uploads directory exists
-        const uploadDir = path.join(process.cwd(), 'uploads');
-        await mkdir(uploadDir, { recursive: true });
-
         const createdProjects = [];
         const createdFiles = [];
 
@@ -40,21 +35,38 @@ export async function POST(req: NextRequest) {
                     },
                 });
 
-                const buffer = Buffer.from(await file.arrayBuffer());
-                const fileName = `${uuidv4()}-${file.name}`;
-                const filePath = path.join(process.cwd(), 'uploads', fileName);
+                const buffer = await file.arrayBuffer();
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${session.user.id}/${project.id}/${uuidv4()}.${fileExt}`;
 
-                await writeFile(filePath, buffer);
+                const { error: uploadError } = await supabaseAdmin
+                    .storage
+                    .from('statements')
+                    .upload(fileName, buffer, {
+                        contentType: file.type,
+                        upsert: false
+                    });
+
+                if (uploadError) {
+                    console.error('Supabase upload error:', uploadError);
+                    throw new Error('Failed to upload file to storage');
+                }
 
                 const fileRecord = await prisma.file.create({
                     data: {
                         name: file.name,
-                        url: filePath,
+                        url: fileName, // Store the path in bucket
                         projectId: project.id,
                         status: 'pending',
                     },
                 });
                 createdFiles.push(fileRecord);
+
+                // Add to queue
+                await processingQueue.add('process-statement', {
+                    fileId: fileRecord.id,
+                    filePath: fileName, // Pass the storage path
+                });
 
                 createdProjects.push(project);
             }
@@ -69,21 +81,38 @@ export async function POST(req: NextRequest) {
             });
 
             for (const file of files) {
-                const buffer = Buffer.from(await file.arrayBuffer());
-                const fileName = `${uuidv4()}-${file.name}`;
-                const filePath = path.join(process.cwd(), 'uploads', fileName);
+                const buffer = await file.arrayBuffer();
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${session.user.id}/${project.id}/${uuidv4()}.${fileExt}`;
 
-                await writeFile(filePath, buffer);
+                const { error: uploadError } = await supabaseAdmin
+                    .storage
+                    .from('statements')
+                    .upload(fileName, buffer, {
+                        contentType: file.type,
+                        upsert: false
+                    });
+
+                if (uploadError) {
+                    console.error('Supabase upload error:', uploadError);
+                    throw new Error('Failed to upload file to storage');
+                }
 
                 const fileRecord = await prisma.file.create({
                     data: {
                         name: file.name,
-                        url: filePath,
+                        url: fileName, // Store the path in bucket
                         projectId: project.id,
                         status: 'pending',
                     },
                 });
                 createdFiles.push(fileRecord);
+
+                // Add to queue
+                await processingQueue.add('process-statement', {
+                    fileId: fileRecord.id,
+                    filePath: fileName, // Pass the storage path
+                });
             }
             createdProjects.push(project);
         }
